@@ -1,73 +1,71 @@
 # SmartBioPH
 
-Plataforma portátil, miniaturizada e de baixo custo para determinação
-colorimétrica de pH usando o sensor multicanal **AS7341** e o indicador
-ácido-base **azul de bromotimol (BTB)**, com leitura em **cubeta** (solução)
-e suporte a impressão 3D das peças usadas no protótipo.
+A portable, miniaturized, and low-cost platform for colorimetric pH
+determination using the **AS7341** multi-channel optical sensor and the
+acid–base indicator **bromothymol blue (BTB)**, with cuvette-based
+(solution) readout and 3D-printable parts for the prototype.
 
-Este repositório acompanha o artigo:
+This repository accompanies the paper:
 
-> *Application of AS7341 sensor in portable, miniaturized and low-cost
-> systems for colorimetric pH determination on paper and solution in
-> saliva samples* — A. G. Xavier, C. C. S. Machado, Y. S. N. da Mota,
-> J. F. S. Petruci, S. G. da Silva. Instituto de Química, Universidade
-> Federal de Uberlândia.
+> *From Solution to Paper: Balancing Analytical Precision and
+> Point-of-Care Simplicity in Salivary pH Colorimetry* — A. G. Xavier,
+> C. C. S. Machado, Y. S. N. da Mota, J. F. S. Petruci, S. G. da Silva.
 
-## Estrutura do repositório
+## Repository structure
 
 ```
 SmartBioPH/
-├── firmware/              firmware PlatformIO (Arduino Uno / ESP32-S3)
-│   ├── platformio.ini      ambientes de build + dependências (lib_deps)
+├── firmware/              PlatformIO firmware (Arduino Uno / ESP32-S3)
+│   ├── platformio.ini      build environments + dependencies (lib_deps)
 │   └── src/
-│       ├── main.cpp         setup/loop, leitura da serial
+│       ├── main.cpp         setup/loop, serial line reading
 │       ├── core/
-│       │   ├── Utils.h        helpers PROGMEM (sem heap/String)
-│       │   ├── SensorManager.h  fábrica do sensor ativo (fixo: AS7341)
-│       │   ├── Measurement.h/.cpp  amostragem e média dos 8 canais
-│       │   └── Protocol.h/.cpp    protocolo JSON via Serial
+│       │   ├── Utils.h        PROGMEM helpers (no heap/String usage)
+│       │   ├── SensorManager.h  active-sensor factory (fixed: AS7341)
+│       │   ├── Measurement.h/.cpp  sampling and 8-channel averaging
+│       │   └── Protocol.h/.cpp    JSON protocol over Serial
 │       └── sensors/
-│           ├── SensorBase.h     interface abstrata de sensor
-│           └── AS7341.h/.cpp    driver do AS7341 (modo reflectância)
-├── web/                    interface web (Web Serial API)
+│           ├── SensorBase.h     abstract sensor interface
+│           └── AS7341.h/.cpp    AS7341 driver (reflectance mode)
+├── web/                    web UI (Web Serial API)
 │   ├── index.html
 │   ├── script.js
 │   └── style.css
-└── hardware/               peças para impressão 3D
-    ├── SmartpH_Cuvette.stl        cubeta de baixo volume (40 mm)
-    ├── SmartpH_Holder.stl         suporte do sensor AS7341
-    ├── Arduino_UNO_Smart_Box.3mf  case do Arduino Uno (projeto completo)
-    └── Arduino_UNO_Smart_Box_part_2.stl  segunda peça do case
+└── hardware/               3D-printable parts
+    ├── SmartpH_Cuvette.stl        reduced-volume cuvette (40 mm)
+    ├── SmartpH_Holder.stl         AS7341 sensor holder
+    ├── Arduino_UNO_Smart_Box.3mf  Arduino Uno case (full project)
+    └── Arduino_UNO_Smart_Box_part_2.stl  second case part
 ```
 
-## Arquitetura do firmware
+## Firmware architecture
 
-O firmware segue uma separação simples em três camadas:
+The firmware follows a simple three-layer separation:
 
-1. **`sensors/`** — implementa `SensorBase`, a interface mínima que
-   qualquer sensor precisa expor (leitura dos canais, ganho, LED). Hoje só
-   existe o driver do `AS7341Sensor`, operando **somente em modo
-   reflectância** (LED interno ligado, sem os modos absorbância/
-   fluorescência nem LEDs externos).
-2. **`core/`** — lógica independente de sensor:
-   - `SensorManager` devolve a instância ativa do sensor (fixa no AS7341,
-     sem seleção por build flag);
-   - `Measurement` faz N leituras e tira a média dos 8 canais;
-   - `Protocol` é o único arquivo que conhece JSON — trata os comandos
-     vindos da serial e monta as respostas.
-   - `Utils` traz helpers para strings em `PROGMEM`, evitando o uso da
-     classe `String` (fragmentação de heap em placas AVR).
-3. **`main.cpp`** — inicializa Serial/I2C/sensor e faz o parsing linha a
-   linha da entrada serial, repassando cada linha completa para
+1. **`sensors/`** — implements `SensorBase`, the minimal interface any
+   sensor needs to expose (channel readout, gain, LED). Currently only
+   the `AS7341Sensor` driver exists, operating **in reflectance mode
+   only** (internal LED on, no absorbance/fluorescence modes and no
+   external LEDs).
+2. **`core/`** — sensor-independent logic:
+   - `SensorManager` returns the active sensor instance (fixed to the
+     AS7341, no build-flag selection);
+   - `Measurement` takes N readings and averages the 8 channels;
+   - `Protocol` is the only file that knows about JSON — it handles
+     incoming serial commands and builds the responses;
+   - `Utils` provides `PROGMEM` string helpers, avoiding the `String`
+     class (heap fragmentation on AVR boards).
+3. **`main.cpp`** — brings up Serial/I2C/the sensor and parses the
+   incoming serial stream line by line, handing each complete line to
    `Protocol::handleCommand`.
 
-A interface web (`web/`) fala com a placa via **Web Serial API**
-(Chrome/Edge), usando o protocolo JSON descrito abaixo — não depende do
-Arduino IDE nem de nenhum backend.
+The web UI (`web/`) talks to the board via the **Web Serial API**
+(Chrome/Edge), using the JSON protocol described below — it has no
+dependency on the Arduino IDE or any backend.
 
-### Protocolo (JSON por linha, via Serial)
+### Protocol (line-delimited JSON over Serial)
 
-**Browser → Placa**
+**Browser → Board**
 ```json
 {"cmd":"get_info"}
 {"cmd":"set_gain","idx":4}
@@ -76,7 +74,7 @@ Arduino IDE nem de nenhum backend.
 {"cmd":"measure"}
 ```
 
-**Placa → Browser**
+**Board → Browser**
 ```json
 {"evt":"info","sensor":"AS7341","channels":[...8...],"gain":{"options":[...],"default":4},"led":{"minMA":4,"maxMA":258,"default":60}}
 {"evt":"ack","cmd":"..."}
@@ -87,69 +85,73 @@ Arduino IDE nem de nenhum backend.
 
 ## Hardware
 
-- Microcontrolador: **Arduino Uno** (testado, ~91% flash / ~40% RAM) ou
-  **ESP32-S3** (USB nativo).
-- Sensor: **AS7341** (Adafruit breakout), 8 canais espectrais (415–680 nm).
-- Cubeta acrílica de baixo volume (40 mm de altura, 900 µL) — arquivo
+- Microcontroller: **Arduino Uno** (tested, ~91% flash / ~40% RAM) or
+  **ESP32-S3** (native USB).
+- Sensor: **AS7341** (Adafruit breakout), 8 spectral channels (415–680 nm).
+- Reduced-volume acrylic cuvette (40 mm height, 900 µL) —
   `hardware/SmartpH_Cuvette.stl`.
-- Suporte impresso em 3D para fixar a geometria sensor/cubeta —
+- 3D-printed holder to fix sensor/cuvette geometry —
   `hardware/SmartpH_Holder.stl`.
-- Case para o Arduino Uno — `hardware/Arduino_UNO_Smart_Box.3mf`
-  (projeto completo, editável) e a peça complementar
+- Arduino Uno case — `hardware/Arduino_UNO_Smart_Box.3mf`
+  (full editable project) plus the complementary part
   `Arduino_UNO_Smart_Box_part_2.stl`.
 
-Os `.stl` podem ser abertos em qualquer fatiador (Cura, PrusaSlicer etc.);
-o `.3mf` preserva o projeto completo (múltiplas peças/posicionamento) e
-abre diretamente no seu fatiador ou no CanvasWorkspace/software de origem.
+The `.stl` files can be opened in any slicer (Cura, PrusaSlicer, etc.);
+the `.3mf` preserves the complete project (multiple parts/placement) and
+opens directly in your slicer or the originating CAD software.
 
-## Como instalar o PlatformIO
+## Installing PlatformIO
 
-O firmware usa **PlatformIO**, que baixa e resolve automaticamente todas
-as bibliotecas (`Adafruit_AS7341`, `Adafruit_BusIO`, `ArduinoJson`)
-listadas em `firmware/platformio.ini` — não é preciso instalar nada à mão.
+The firmware uses **PlatformIO**, which automatically downloads and
+resolves all libraries (`Adafruit_AS7341`, `Adafruit_BusIO`,
+`ArduinoJson`) listed in `firmware/platformio.ini` — no manual library
+installation is needed.
 
-**Opção recomendada — VS Code:**
-1. Instale o [VS Code](https://code.visualstudio.com/).
-2. Instale a extensão **PlatformIO IDE** (aba de extensões, busque
+**Recommended — VS Code:**
+1. Install [VS Code](https://code.visualstudio.com/).
+2. Install the **PlatformIO IDE** extension (Extensions tab, search for
    "PlatformIO IDE").
-3. Abra a pasta `firmware/` deste repositório em *File → Open Folder*.
-   O PlatformIO detecta o `platformio.ini` e baixa as dependências
-   automaticamente na primeira vez que você compilar.
+3. Open the `firmware/` folder from this repository via
+   *File → Open Folder*. PlatformIO detects `platformio.ini` and
+   downloads the dependencies automatically the first time you build.
 
-**Opção via linha de comando (CLI):**
+**Command-line option:**
 ```bash
-# instala o PlatformIO Core (precisa de Python 3)
+# install PlatformIO Core (requires Python 3)
 pip install -U platformio
 
-# dentro da pasta firmware/
+# inside the firmware/ folder
 cd firmware
-pio run                      # compila os dois ambientes e já baixa as libs
-pio run -e uno -t upload     # compila e grava no Arduino Uno
-pio run -e as7341_esp32s3 -t upload   # compila e grava no ESP32-S3
+pio run                      # builds both environments and fetches the libs
+pio run -e uno -t upload     # build and flash to Arduino Uno
+pio run -e as7341_esp32s3 -t upload   # build and flash to ESP32-S3
 ```
 
-Não é necessário nenhum passo manual de instalação de bibliotecas: o
-PlatformIO lê `lib_deps` em `platformio.ini` e resolve tudo sozinho, tanto
-pelo VS Code quanto pela CLI.
+No manual library-installation step is required: PlatformIO reads
+`lib_deps` in `platformio.ini` and resolves everything on its own,
+whether from VS Code or the CLI.
 
-## Como usar
+## Usage
 
-1. Conecte o AS7341 à placa via I2C (SDA/SCL) e ligue a placa ao PC por USB.
-2. Grave o firmware (`pio run -e uno -t upload` ou `-e as7341_esp32s3`).
-3. Abra `web/index.html` em **Chrome ou Edge** (a Web Serial API não
-   funciona em Firefox/Safari).
-4. Clique em **Connect via USB**, selecione a porta da placa.
-5. Ajuste Gain, LED current e Number of samples, clique em **Send setup**.
-6. Clique em **Measure** para disparar uma leitura e ver o resultado dos
-   8 canais espectrais.
+1. Connect the AS7341 to the board via I2C (SDA/SCL) and plug the board
+   into the PC over USB.
+2. Flash the firmware (`pio run -e uno -t upload` or `-e as7341_esp32s3`).
+3. Open `web/index.html` in **Chrome or Edge** (the Web Serial API does
+   not work in Firefox/Safari).
+4. Click **Connect via USB** and select the board's port.
+5. Adjust Gain, LED current, and Number of samples, then click
+   **Send setup**.
+6. Click **Measure** to trigger a reading and view the results for all
+   8 spectral channels.
 
-## Licença
+## License
 
-Este projeto está sob a licença MIT — veja [LICENSE](LICENSE). Se você
-preferir outra licença (ex.: GPL, Apache-2.0) para o repositório do
-artigo, é só trocar o arquivo.
+This project is released under the MIT License — see [LICENSE](LICENSE).
+If you'd prefer a different license (e.g. GPL, Apache-2.0) for the
+paper's repository, just swap the file.
 
-## Citação
+## Citation
 
-Se este código ou as peças forem úteis no seu trabalho, cite o artigo
-correspondente (dados completos serão atualizados após publicação).
+If this code or the parts are useful in your work, please cite the
+corresponding paper (full citation details to be updated upon
+publication).
