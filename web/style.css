@@ -1,0 +1,153 @@
+* { box-sizing: border-box; }
+
+body {
+  background: #0f0d0b;
+  font-family: -apple-system, "Segoe UI", sans-serif;
+  margin: 0;
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.panel {
+  width: 100%;
+  max-width: 420px;
+  background: #171512;
+  border: 1px solid #d9662f;
+  border-radius: 8px;
+  padding: 18px 20px;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+h1 {
+  color: #f2efe9;
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.btn-connect {
+  background: #2b2823;
+  color: #e8e5de;
+  border: 1px solid #4a463e;
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 11px;
+  cursor: pointer;
+}
+.btn-connect:hover { border-color: #d9662f; }
+
+.status-line {
+  color: #9c988f;
+  font-size: 12px;
+  margin: 0 0 16px;
+}
+
+.hidden { display: none; }
+
+.field-label {
+  display: block;
+  color: #e8e5de;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.field-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+
+.select {
+  width: 100%;
+  background: #2b2823;
+  color: #e8e5de;
+  border: 1px solid #4a463e;
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+.select-accent { border-color: #d9662f; }
+
+.value-badge {
+  background: #d9662f;
+  color: #171512;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+
+.slider {
+  width: 100%;
+  accent-color: #d9662f;
+  margin-bottom: 2px;
+}
+
+.unit-line {
+  text-align: right;
+  color: #9c988f;
+  font-size: 11px;
+  margin-bottom: 14px;
+}
+
+.btn-setup {
+  width: 100%;
+  background: #3a3630;
+  color: #e8e5de;
+  border: none;
+  border-radius: 4px;
+  padding: 9px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+.btn-setup:hover { background: #4a463e; }
+.btn-setup:disabled { color: #6b6760; cursor: not-allowed; }
+
+.box {
+  border: 1px solid #d9662f;
+  border-radius: 6px;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+}
+
+.box-title {
+  color: #f2efe9;
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0 0 6px;
+}
+
+.box-line {
+  color: #9c988f;
+  font-size: 12px;
+  margin: 2px 0;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.result-cell {
+  border: 1px solid #d9662f;
+  border-radius: 4px;
+  padding: 6px 8px;
+  color: #e8e5de;
+  font-family: "SF Mono", Consolas, monospace;
+  font-size: 12px;
+}

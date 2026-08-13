@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartBiopH - Cuvette</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="panel">
+    <div class="panel-header">
+      <h1>SmartBiopH - Cuvette</h1>
+      <button id="btn-connect" class="btn btn-connect">Connect via USB</button>
+    </div>
+
+    <p id="status-line" class="status-line">Not connected</p>
+
+    <div id="setup" class="setup hidden">
+      <label class="field-label" for="gain">Gain:</label>
+      <select id="gain" class="select"></select>
+
+      <div class="field-row">
+        <label class="field-label" for="led">LED current:</label>
+        <span id="led-value" class="value-badge">60</span>
+      </div>
+      <input type="range" id="led" class="slider" min="4" max="258" value="60" />
+      <div class="unit-line">mA</div>
+
+      <div class="field-row">
+        <label class="field-label" for="samples">Number of samples:</label>
+        <span id="samples-value" class="value-badge">1</span>
+      </div>
+      <input type="range" id="samples" class="slider" min="1" max="20" value="1" />
+
+      <label class="field-label" for="sample-type">Sample type:</label>
+      <select id="sample-type" class="select select-accent">
+        <option value="raw">Raw</option>
+      </select>
+
+      <button id="btn-send-setup" class="btn btn-setup">Send setup</button>
+
+      <div class="box">
+        <p class="box-title">Current setup configuration:</p>
+        <p class="box-line" id="cfg-samples">Number of samples: 1</p>
+        <p class="box-line" id="cfg-type">Sample type: Raw</p>
+        <p class="box-line" id="cfg-gain">Gain: 16x</p>
+        <p class="box-line" id="cfg-led">LED current: 60 mA</p>
+      </div>
+
+      <button id="btn-measure" class="btn btn-setup">Measure</button>
+
+      <div class="box">
+        <p class="box-title">Results</p>
+        <p class="box-line" id="sample-number">Sample number: 0</p>
+        <div id="results-grid" class="results-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
