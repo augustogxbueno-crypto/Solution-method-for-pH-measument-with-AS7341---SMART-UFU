@@ -33,7 +33,7 @@ SmartBioPH/
 │   └── style.css
 └── 3D printing
     ├── SmartpH_Cuvette and Sensor.stl        
-    ├── SmartpH_Holder.stl         AS7341 sensor holder
+    ├── SmartpH_Cover.stl         
     ├── Arduino_UNO_Smart_Box.3mf  Arduino Uno case (full project)
     └── Arduino_UNO_Smart_Box_part_2.stl  second case part
 ```
@@ -88,9 +88,9 @@ dependency on the Arduino IDE or any backend.
 - Microcontroller: **Arduino Uno** (tested, ~91% flash / ~40% RAM) or
   **ESP32-S3** (native USB).
 - Sensor: **AS7341** (Adafruit breakout), 8 spectral channels (415–680 nm).
-- Reduced-volume acrylic cuvette (40 mm height, 900 µL) —
+- 3D-printed Sensor and cuvette holder —
   `3D printing/SmartpH_Cuvette and Sensor.stl`.
-- 3D-printed holder to fix sensor/cuvette geometry —
+- 3D-printed cover to the cuvette —
   `3D printing/SmartpH_Cover`.
 - Arduino Uno case — `hardware/Arduino_UNO_Smart_Box.3mf`
   (full editable project) plus the complementary part
